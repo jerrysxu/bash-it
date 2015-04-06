@@ -25,7 +25,6 @@ function myip ()
     echo -e "Your public IP is: ${echo_bold_green} $res ${echo_normal}"
 }
 
-
 function pickfrom ()
 {
     about 'picks random line from file'
@@ -39,19 +38,26 @@ function pickfrom ()
     head -n $n $file | tail -1
 }
 
-function pass ()
+function passgen ()
 {
     about 'generates random password from dictionary words'
     param 'optional integer length'
     param 'if unset, defaults to 4'
-    example '$ pass'
-    example '$ pass 6'
+    example '$ passgen'
+    example '$ passgen 6'
     group 'base'
     local i pass length=${1:-4}
     pass=$(echo $(for i in $(eval echo "{1..$length}"); do pickfrom /usr/share/dict/words; done))
     echo "With spaces (easier to memorize): $pass"
-    echo "Without (use this as the pass): $(echo $pass | tr -d ' ')"
+    echo "Without (use this as the password): $(echo $pass | tr -d ' ')"
 }
+
+# Create alias pass to passgen when pass isn't installed or
+# BASH_IT_LEGACY_PASS is true.
+if ! command -v pass &>/dev/null || [ "$BASH_IT_LEGACY_PASS" = true ]
+then
+  alias pass=passgen
+fi
 
 function pmdown ()
 {
@@ -85,7 +91,6 @@ function lsgrep ()
     ls | grep "$*"
 }
 
-
 function pman ()
 {
     about 'view man documentation in Preview'
@@ -94,7 +99,6 @@ function pman ()
     group 'base'
     man -t "${1}" | open -f -a $PREVIEW
 }
-
 
 function pcurl ()
 {
@@ -118,16 +122,16 @@ function quiet ()
 {
     about 'what *does* this do?'
     group 'base'
-	$* &> /dev/null &
+    $* &> /dev/null &
 }
 
 function banish-cookies ()
 {
     about 'redirect .adobe and .macromedia files to /dev/null'
     group 'base'
-	rm -r ~/.macromedia ~/.adobe
-	ln -s /dev/null ~/.adobe
-	ln -s /dev/null ~/.macromedia
+    rm -r ~/.macromedia ~/.adobe
+    ln -s /dev/null ~/.adobe
+    ln -s /dev/null ~/.macromedia
 }
 
 function usage ()
@@ -177,7 +181,6 @@ function command_exists ()
 
 mkiso ()
 {
-
     about 'creates iso from current dir in the parent dir (unless defined)'
     param '1: ISO name'
     param '2: dest/path'

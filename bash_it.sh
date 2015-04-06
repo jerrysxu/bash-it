@@ -2,7 +2,14 @@
 # Initialize Bash It
 
 # Reload Library
-alias reload='source ~/.bash_profile'
+case $OSTYPE in
+  darwin*)
+    alias reload='source ~/.bash_profile'
+    ;;
+  *)
+    alias reload='source ~/.bashrc'
+    ;;
+esac
 
 # Only set $BASH_IT if it's not already set
 if [ -z "$BASH_IT" ];
@@ -22,7 +29,7 @@ then
 fi
 
 # Load composure first, so we support function metadata
-source "${BASH_IT}/lib/composure.sh"
+source "${BASH_IT}/lib/composure.bash"
 
 # support 'plumbing' metadata
 cite _about _param _example _group _author _version
