@@ -13,7 +13,7 @@ if type -P ack &>/dev/null ; then
     ack "$*" --ignore-dir=log --color-match=green --color-filename=blue --smart-case
   }
   f(){
-    ack -i -g ".*$*[^\/]*$" | highlight blue ".*/" green "$*[^/]"
+    ack -i --type-set='all:match:.*' -k -g ".*$*[^\/]*$" | highlight blue ".*/" green "$*[^/]"
   }
 else
   g(){
