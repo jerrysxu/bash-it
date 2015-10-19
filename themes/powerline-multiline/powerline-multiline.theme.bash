@@ -5,6 +5,7 @@ THEME_PROMPT_LEFT_SEPARATOR=""
 
 SHELL_SSH_CHAR=${SHELL_SSH_CHAR:=" "}
 SHELL_THEME_PROMPT_COLOR=32
+SHELL_THEME_PROMPT_COLOR_SUDO=202
 
 VIRTUALENV_CHAR=${POWERLINE_VIRTUALENV_CHAR:="❲p❳ "}
 CONDA_VIRTUALENV_CHAR=${POWERLINE_CONDA_VIRTUALENV_CHAR:="❲c❳ "}
@@ -41,6 +42,10 @@ BATTERY_STATUS_THEME_PROMPT_CRITICAL_COLOR=160
 
 THEME_PROMPT_CLOCK_FORMAT=${THEME_PROMPT_CLOCK_FORMAT:="%H:%M:%S"}
 
+IN_VIM_PROMPT_COLOR=35
+IN_VIM_PROMPT_TEXT="vim"
+
+
 function set_rgb_color {
     if [[ "${1}" != "-" ]]; then
         fg="38;5;${1}"
@@ -53,6 +58,10 @@ function set_rgb_color {
 }
 
 function powerline_shell_prompt {
+    SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR}
+    if sudo -n uptime 2>&1 | grep -q "load"; then
+        SHELL_PROMPT_COLOR=${SHELL_THEME_PROMPT_COLOR_SUDO}
+    fi
     SEGMENT_AT_RIGHT=0
     if [[ -n "${SSH_CLIENT}" ]]; then
         SHELL_PROMPT="${SHELL_SSH_CHAR}${USER}@${HOSTNAME}"
@@ -60,8 +69,8 @@ function powerline_shell_prompt {
         SHELL_PROMPT="${USER}"
     fi
     RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#SHELL_PROMPT} + 2 ))
-    SHELL_PROMPT="$(set_rgb_color - ${SHELL_THEME_PROMPT_COLOR}) ${SHELL_PROMPT} ${normal}"
-    LAST_THEME_COLOR=${SHELL_THEME_PROMPT_COLOR}
+    SHELL_PROMPT="$(set_rgb_color - ${SHELL_PROMPT_COLOR}) ${SHELL_PROMPT} ${normal}"
+    LAST_THEME_COLOR=${SHELL_PROMPT_COLOR}
     (( SEGMENT_AT_RIGHT += 1 ))
 }
 
@@ -167,9 +176,9 @@ function powerline_battery_status_prompt {
     if [[ -z "${BATTERY_STATUS}" ]] || [[ "${BATTERY_STATUS}" = "-1" ]] || [[ "${BATTERY_STATUS}" = "no" ]]; then
         BATTERY_PROMPT=""
     else
-        if [[ "${BATTERY_STATUS}" -le 5 ]]; then
+        if [[ "$((10#${BATTERY_STATUS}))" -le 5 ]]; then
              BATTERY_STATUS_THEME_PROMPT_COLOR="${BATTERY_STATUS_THEME_PROMPT_CRITICAL_COLOR}"
-        elif [[ "${BATTERY_STATUS}" -le 25 ]]; then
+        elif [[ "$((10#${BATTERY_STATUS}))" -le 25 ]]; then
             BATTERY_STATUS_THEME_PROMPT_COLOR="${BATTERY_STATUS_THEME_PROMPT_LOW_COLOR}"
         else
             BATTERY_STATUS_THEME_PROMPT_COLOR="${BATTERY_STATUS_THEME_PROMPT_GOOD_COLOR}"
@@ -185,6 +194,22 @@ function powerline_battery_status_prompt {
         (( SEGMENT_AT_RIGHT += 1 ))
     fi
 }
+
+function powerline_in_vim_prompt {
+  if [ -z "$VIMRUNTIME" ]; then
+    IN_VIM_PROMPT=""
+  else
+    IN_VIM_PROMPT="$(set_rgb_color - ${IN_VIM_PROMPT_COLOR}) ${IN_VIM_PROMPT_TEXT} "
+    if [[ "${SEGMENT_AT_RIGHT}" -gt 0 ]]; then
+      IN_VIM_PROMPT+=$(set_rgb_color ${LAST_THEME_COLOR} ${IN_VIM_PROMPT_COLOR})${THEME_PROMPT_LEFT_SEPARATOR}${normal}
+      (( RIGHT_PROMPT_LENGTH += SEGMENT_AT_RIGHT ))
+    fi
+    RIGHT_PROMPT_LENGTH=$(( ${RIGHT_PROMPT_LENGTH} + ${#IN_VIM_PROMPT_TEXT} ))
+    LAST_THEME_COLOR=${IN_VIM_PROMPT_COLOR}
+    (( SEGMENT_AT_RIGHT += 1 ))
+  fi
+}
+
 
 function powerline_prompt_command() {
     local LAST_STATUS="$?"
@@ -205,11 +230,12 @@ function powerline_prompt_command() {
     powerline_shell_prompt
     powerline_battery_status_prompt
     powerline_clock_prompt
+    powerline_in_vim_prompt
 
     [[ "${SEGMENT_AT_RIGHT}" -eq 1 ]] && (( RIGHT_PROMPT_LENGTH-=1 ))
 
     RIGHT_PROMPT="\033[${RIGHT_PROMPT_LENGTH}D$(set_rgb_color ${LAST_THEME_COLOR} -)${THEME_PROMPT_LEFT_SEPARATOR}${normal}"
-    RIGHT_PROMPT+="${CLOCK_PROMPT}${BATTERY_PROMPT}${SHELL_PROMPT}${normal}"
+    RIGHT_PROMPT+="${IN_VIM_PROMPT}${CLOCK_PROMPT}${BATTERY_PROMPT}${SHELL_PROMPT}${normal}"
 
     PS1="${LEFT_PROMPT}${RIGHT_PROMPT}\n${LAST_STATUS_PROMPT}${PROMPT_CHAR} "
 }
