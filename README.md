@@ -19,10 +19,14 @@ Bash-it provides a solid framework for using, developing and maintaining shell s
 The install script can take the following options:
 
 * `--interactive`: Asks the user which aliases, completions and plugins to enable.
+* `--silent`: Ask nothing and install using default settings.
+* `--no-modify-config`: Do not modify the existing config file (`~/.bash_profile` or `~/.bashrc`).
 
 When run without the `--interactive` switch, Bash-it only enables a sane default set of functionality to keep your shell clean and to avoid issues with missing dependencies. Feel free to enable the tools you want to use after the installation.
 
-**NOTE**: Keep in mind how Bash load its configuration files, `.bash_profile` for login shells (and in Mac OS X in terminal emulators like [Termminal.app](http://www.apple.com/osx/apps/) or [iTerm2](https://www.iterm2.com/)) and `.bashrc` for interactive shells (default mode in most of the GNU/Linux terminal emulators), to ensure that Bash-it is loaded correctly. A good "practice" is sourcing `.bashrc` into `.bash_profile` to keep things working in all the scenarios, to achieve this, you can add this snippet in your `.bash_profile`:
+When you run without the `--no-modify-config` switch, the Bash-it installer automatically modifies/replaces your existing config file. Use the `--no-modify-config` switch to avoid unwanted modifications, e.g. if your Bash config file already contains the code that loads Bash-it.
+
+**NOTE**: Keep in mind how Bash load its configuration files, `.bash_profile` for login shells (and in Mac OS X in terminal emulators like [Terminal.app](http://www.apple.com/osx/apps/) or [iTerm2](https://www.iterm2.com/)) and `.bashrc` for interactive shells (default mode in most of the GNU/Linux terminal emulators), to ensure that Bash-it is loaded correctly. A good "practice" is sourcing `.bashrc` into `.bash_profile` to keep things working in all the scenarios, to achieve this, you can add this snippet in your `.bash_profile`:
 
 ```
 if [ -f ~/.bashrc ]; then
@@ -124,6 +128,8 @@ For custom scripts, and aliases, just create the following files (they'll be ign
 * `custom/themes/<custom theme name>/<custom theme name>.theme.bash`
 
 Anything in the custom directory will be ignored, with the exception of `custom/example.bash`.
+
+Alternately, if you would like to keep your custom scripts under version control, you can set BASH_IT_CUSTOM in your `~/.bashrc` to another location outside of the `~/.bash_it` folder.
 
 ## Themes
 
