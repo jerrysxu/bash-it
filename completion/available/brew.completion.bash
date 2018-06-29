@@ -1,11 +1,9 @@
 if which brew >/dev/null 2>&1; then
-  BREW_PREFIX=$(brew --prefix)
-
-  if [ -f "$BREW_PREFIX"/etc/bash_completion.d/brew ]; then
-    . "$BREW_PREFIX"/etc/bash_completion.d/brew
+  if [ -f `brew --prefix`/etc/bash_completion ]; then
+    . `brew --prefix`/etc/bash_completion
   fi
 
-  if [ -f "$BREW_PREFIX"/Library/Contributions/brew_bash_completion.sh ]; then
-    . "$BREW_PREFIX"/Library/Contributions/brew_bash_completion.sh
+  if [ -f `brew --prefix`/Library/Contributions/brew_bash_completion.sh ]; then
+    . `brew --prefix`/Library/Contributions/brew_bash_completion.sh
   fi
 fi

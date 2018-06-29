@@ -9,11 +9,10 @@ function __powerline_right_segment {
   local params=( $1 )
   IFS="${OLD_IFS}"
   local separator_char="${POWERLINE_RIGHT_SEPARATOR}"
-  local padding="${POWERLINE_PADDING}"
+  local padding=2
   local separator_color=""
 
   if [[ "${SEGMENTS_AT_RIGHT}" -eq 0 ]]; then
-    separator_char="${POWERLINE_RIGHT_END}"
     separator_color="$(set_color ${params[1]} -)"
   else
     separator_color="$(set_color ${params[1]} ${LAST_SEGMENT_COLOR})"
@@ -42,17 +41,15 @@ function __powerline_prompt_command {
     local info="$(__powerline_${segment}_prompt)"
     [[ -n "${info}" ]] && __powerline_left_segment "${info}"
   done
-  [[ -n "${LEFT_PROMPT}" ]] && LEFT_PROMPT+="$(set_color ${LAST_SEGMENT_COLOR} -)${POWERLINE_LEFT_END}${normal}"
+  [[ -n "${LEFT_PROMPT}" ]] && LEFT_PROMPT+="$(set_color ${LAST_SEGMENT_COLOR} -)${separator_char}${normal}"
 
   ## right prompt ##
   if [[ -n "${POWERLINE_RIGHT_PROMPT}" ]]; then
-    # LEFT_PROMPT+="${move_cursor_rightmost}"
+    LEFT_PROMPT+="${move_cursor_rightmost}"
     for segment in $POWERLINE_RIGHT_PROMPT; do
       local info="$(__powerline_${segment}_prompt)"
       [[ -n "${info}" ]] && __powerline_right_segment "${info}"
     done
-    RIGHT_PAD=$(printf "%.s " $(seq 1 $RIGHT_PROMPT_LENGTH))
-    LEFT_PROMPT+="${RIGHT_PAD}${move_cursor_rightmost}"
     LEFT_PROMPT+="\033[${RIGHT_PROMPT_LENGTH}D"
   fi
 

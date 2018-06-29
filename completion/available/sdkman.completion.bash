@@ -53,7 +53,8 @@ _sdkman_candidate_versions(){
 
 __sdkman_cleanup_local_versions(){
 
-  __sdkman_build_version_csv $1 | tr ',' ' '
+  __sdkman_build_version_csv $1
+  echo $CSV | tr ',' ' '
 
 }
 

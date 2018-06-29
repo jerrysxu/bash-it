@@ -42,7 +42,7 @@ function __awskeys_get {
 }
 
 function __awskeys_list {
-    local credentials_list="$((egrep '^\[ *[a-zA-Z0-9_-]+ *\]$' ~/.aws/credentials; grep "\[profile" ~/.aws/config | sed "s|\[profile |\[|g") | sort | uniq)"
+    local credentials_list="$(egrep '^\[ *[a-zA-Z0-9_-]+ *\]$' ~/.aws/credentials)"
     if [[ -n $"{credentials_list}" ]]; then
         echo -e "Available credentials profiles:\n"
         for profile in ${credentials_list}; do
@@ -64,14 +64,12 @@ function __awskeys_show {
 }
 
 function __awskeys_export {
-    if [[ $(__awskeys_list) == *"$1"* ]]; then
-        local p_keys=( $(__awskeys_get $1 | tr -d " ") )
-        if [[ -n "${p_keys}" ]]; then
-            for p_key in ${p_keys[@]}; do
-                local key="${p_key%=*}"
-                export "$(echo ${key} | tr [:lower:] [:upper:])=${p_key#*=}"
-            done
-        fi
+    local p_keys=( $(__awskeys_get $1 | tr -d " ") )
+    if [[ -n "${p_keys}" ]]; then
+        for p_key in ${p_keys[@]}; do
+            local key="${p_key%=*}"
+            export "$(echo ${key} | tr [:lower:] [:upper:])=${p_key#*=}"
+        done
         export AWS_DEFAULT_PROFILE="$1"
     else
         echo "Profile $1 not found in credentials file"
